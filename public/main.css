@@ -3,8 +3,18 @@
   src: url('./Pacifico-Regular.ttf') format('truetype');
 }
 
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --black: #000;
+
+}
+
 body {
   font-family: 'Verdana', sans-serif;
+  margin: 0;
 }
 
 h1,
@@ -23,8 +33,33 @@ h6 {
 }
 
 /* nav */
-nav {
-  height: 700px;
+ul {
+  margin: 0;
+  list-style-type: none;
+  padding: 0;
+}
+
+.navigation ul {
+  display: flex;
+  justify-content: start;
+}
+
+.navigation ul li {
+  flex: 0 0 12.5%;
+  text-align: right;
+}
+
+.navigation ul li:first-child {
+  margin-right: auto;
+  text-align: left;
+}
+
+
+
+a:link {
+  text-decoration: none;
+  color: var(--black
+  );
 }
 
 
