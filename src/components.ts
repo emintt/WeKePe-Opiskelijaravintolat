@@ -16,6 +16,25 @@ const restaurantRow = (restaurant: Restaurant): HTMLTableRowElement => {
   return tr;
 };
 
+const restaurantItem = (restaurant: Restaurant, distance: number): HTMLDivElement => {
+  const {name, address, postalCode, city, company} = restaurant;
+  const div = document.createElement('div');
+  div.classList.add('restaurant-list-item');
+  const h2 = document.createElement('h2');
+  h2.innerText = name;
+  const p1 = document.createElement('p');
+  p1.innerText = `${distance} km matka`;
+  const p2 = document.createElement('p');
+  p2.innerText = `${address}, ${postalCode}, ${city}`;
+  const p3 = document.createElement('p');
+  p3.innerText = `${company}`;
+  div.appendChild(h2);
+  div.appendChild(p1);
+  div.appendChild(p2);
+  div.appendChild(p3);
+  return div;
+}
+
 const restaurantModal = (restaurant: Restaurant, menu: Menu): string => {
   const {name, address, city, postalCode, phone, company} = restaurant;
   let html = `<h3>${name}</h3>
@@ -51,4 +70,4 @@ const errorModal = (message: string) => {
   return html;
 };
 
-export {restaurantRow, restaurantModal, errorModal};
+export {restaurantRow, restaurantModal, errorModal, restaurantItem};

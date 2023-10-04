@@ -1,4 +1,4 @@
-import { errorModal, restaurantModal, restaurantRow } from "./components";
+import { errorModal, restaurantModal, restaurantRow, restaurantItem } from "./components";
 import { fetchData } from "./functions";
 import { Menu } from "./interfaces/Menu";
 import { Restaurant } from "./interfaces/Restaurant";
@@ -14,6 +14,19 @@ modal.addEventListener('click', () => {
 
 const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number=>
   Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+
+const createRestaurants = (restaurants: Restaurant[]) => {
+  const wrapper = document.querySelector('.restaurant-list-wrapper') as HTMLElement | null;
+  console.log(wrapper);
+  if (wrapper !== null) {
+    wrapper.innerHTML = '';
+    restaurants.forEach((restaurant) => {
+      const div: HTMLDivElement = restaurantItem(restaurant, 0);
+      wrapper.appendChild(div);
+    });
+  }
+
+}
 
 const createTable = (restaurants: Restaurant[]) => {
   const table = document.querySelector<HTMLTableElement>('table') as HTMLTableElement | null;
@@ -61,6 +74,7 @@ const error = (err: GeolocationPositionError) => {
 const success = async (pos: GeolocationPosition) => {
   try {
     const crd = pos.coords;
+    console.log(crd);
     const restaurants = await fetchData<Restaurant[]>(apiUrl + '/restaurants');
     console.log(restaurants);
     restaurants.sort((a: Restaurant, b: Restaurant) => {
@@ -74,7 +88,8 @@ const success = async (pos: GeolocationPosition) => {
       const distanceB: number = calculateDistance(x1, y1, x2b, y2b);
       return distanceA - distanceB;
     });
-    createTable(restaurants);
+    // createTable(restaurants);
+    createRestaurants(restaurants);
     // buttons for filtering
     const sodexoBtn = document.querySelector('#sodexo') as HTMLButtonElement | null;
     const compassBtn = document.querySelector('#compass') as HTMLButtonElement | null;

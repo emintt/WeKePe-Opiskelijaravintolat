@@ -3,6 +3,16 @@
   src: url('./Pacifico-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'Alegreya';
+  src: url('./Alegreya-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Worksans';
+  src: url('./WorkSans-Regular.ttf') format('truetype');
+}
+
 * {
   box-sizing: border-box;
 }
@@ -13,8 +23,12 @@
 }
 
 body {
-  font-family: 'Verdana', sans-serif;
+  font-family: 'Worksans', 'Verdana', sans-serif;
   margin: 0;
+}
+
+body:has(dialog[open]) {
+    overflow-y: hidden;
 }
 
 h1,
@@ -23,7 +37,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Pacifico', cursive;
+  font-family: 'Alegreya', cursive;
 }
 
 .container {
@@ -33,6 +47,12 @@ h6 {
 }
 
 /* nav */
+.banner-container {
+  background-image: url(./img/pexels-ella-olsson-PhotoRoom.png);
+  background-color: red;
+  max-width: 1200px;
+  height: 300px;
+}
 ul {
   margin: 0;
   list-style-type: none;
@@ -61,7 +81,35 @@ a:link {
   color: var(--black
   );
 }
+.restaurant-list-item {
+  padding: 0;
+}
 
+.restaurant-list-item h2 {
+  margin-bottom: 0;
+  font-size: 3em;
+}
+
+.restaurant-list-item p {
+  margin: 0.125em;
+
+}
+
+
+.restaurant-list-main div:first-child {
+  margin-right: auto;
+}
+
+/*filter*/
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters button {
+  border: none;
+  cursor: pointer;
+}
 
 form {
   margin: 0 auto;
