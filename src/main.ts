@@ -1,8 +1,10 @@
-import { errorModal, restaurantModal, restaurantRow, restaurantItem } from "./components";
+import { getDistance } from "geolib";
+import { errorModal, restaurantModal, restaurantItem } from "./components";
 import { fetchData } from "./functions";
 import { Menu } from "./interfaces/Menu";
 import { Restaurant } from "./interfaces/Restaurant";
 import { apiUrl, positionOptions } from "./variables";
+
 
 const modal = document.querySelector('dialog') as HTMLDialogElement | null;
 if (!modal) {
@@ -15,57 +17,50 @@ modal.addEventListener('click', () => {
 const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number=>
   Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
-const createRestaurants = (restaurants: Restaurant[]) => {
+const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinates) => {
   const wrapper = document.querySelector('.restaurant-list-wrapper') as HTMLElement | null;
-  console.log(wrapper);
   if (wrapper !== null) {
     wrapper.innerHTML = '';
     restaurants.forEach((restaurant) => {
-      const div: HTMLDivElement = restaurantItem(restaurant, 0);
+      const x = {latitude: crd.latitude, longitude: crd.longitude};
+      const y = {latitude: restaurant.location.coordinates[1], longitude: restaurant.location.coordinates[0]}
+      const distance =  getDistance(x, y, 1); // distance in meters from geolib
+      const div: HTMLDivElement = restaurantItem(restaurant, distance);
       wrapper.appendChild(div);
+      const h2 = div.querySelector('h2') as HTMLHeadingElement | null;
+      if (h2 !== null) {
+        h2.addEventListener('click', async () => {
+          try {
+            // remove all highlights
+            const allHighs = document.querySelectorAll('.highlight');
+            allHighs.forEach((high) => {
+              high.classList.remove('highlight');
+            });
+            // add highlight
+            div.classList.add('highlight');
+            // add restaurant data to modal
+            modal.innerHTML = '';
+
+            // fetch menu
+            const menu: Menu = await fetchData(
+              apiUrl + `/restaurants/daily/${restaurant._id}/fi`
+            );
+            console.log(menu);
+
+            const menuHtml = restaurantModal(restaurant, menu);
+            modal.insertAdjacentHTML('beforeend', menuHtml);
+
+            modal.showModal();
+          } catch (error) {
+            modal.innerHTML = errorModal((error as Error).message);
+            modal.showModal();
+          }
+        });
+      }
     });
   }
 
 }
-
-const createTable = (restaurants: Restaurant[]) => {
-  const table = document.querySelector<HTMLTableElement>('table') as HTMLTableElement | null;
-  if (table !== null) {
-    table.innerHTML = '';
-    restaurants.forEach((restaurant) => {
-      const tr: HTMLTableRowElement = restaurantRow(restaurant);
-      table.appendChild(tr);
-      tr.addEventListener('click', async () => {
-        try {
-          // remove all highlights
-          const allHighs = document.querySelectorAll('.highlight');
-          allHighs.forEach((high) => {
-            high.classList.remove('highlight');
-          });
-          // add highlight
-          tr.classList.add('highlight');
-          // add restaurant data to modal
-          modal.innerHTML = '';
-
-          // fetch menu
-          const menu: Menu = await fetchData(
-            apiUrl + `/restaurants/daily/${restaurant._id}/fi`
-          );
-          console.log(menu);
-
-          const menuHtml = restaurantModal(restaurant, menu);
-          modal.insertAdjacentHTML('beforeend', menuHtml);
-
-          modal.showModal();
-        } catch (error) {
-          modal.innerHTML = errorModal((error as Error).message);
-          modal.showModal();
-        }
-      });
-    });
-  }
-
-};
 
 const error = (err: GeolocationPositionError) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -74,7 +69,7 @@ const error = (err: GeolocationPositionError) => {
 const success = async (pos: GeolocationPosition) => {
   try {
     const crd = pos.coords;
-    console.log(crd);
+    // console.log(crd);
     const restaurants = await fetchData<Restaurant[]>(apiUrl + '/restaurants');
     console.log(restaurants);
     restaurants.sort((a: Restaurant, b: Restaurant) => {
@@ -88,8 +83,7 @@ const success = async (pos: GeolocationPosition) => {
       const distanceB: number = calculateDistance(x1, y1, x2b, y2b);
       return distanceA - distanceB;
     });
-    // createTable(restaurants);
-    createRestaurants(restaurants);
+    createRestaurants(restaurants, crd);
     // buttons for filtering
     const sodexoBtn = document.querySelector('#sodexo') as HTMLButtonElement | null;
     const compassBtn = document.querySelector('#compass') as HTMLButtonElement | null;
@@ -104,7 +98,7 @@ const success = async (pos: GeolocationPosition) => {
         (restaurant) => restaurant.company === 'Sodexo'
       );
       console.log(sodexoRestaurants);
-      createTable(sodexoRestaurants);
+      createRestaurants(restaurants, crd);
     });
 
     compassBtn.addEventListener('click', () => {
@@ -112,11 +106,11 @@ const success = async (pos: GeolocationPosition) => {
         (restaurant) => restaurant.company === 'Compass Group'
       );
       console.log(compassRestaurants);
-      createTable(compassRestaurants);
+      createRestaurants(restaurants, crd);
     });
 
     resetBtn.addEventListener('click', () => {
-      createTable(restaurants);
+      createRestaurants(restaurants, crd);
     });
   } catch (error) {
     modal.innerHTML = errorModal((error as Error).message);
