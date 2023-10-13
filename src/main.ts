@@ -1,7 +1,7 @@
 import { getDistance } from "geolib";
 import { errorModal, restaurantModal, restaurantItem } from "./components";
 import { fetchData } from "./functions";
-import { Menu } from "./interfaces/Menu";
+import { Menu, MenuWeekly } from "./interfaces/Menu";
 import { Restaurant } from "./interfaces/Restaurant";
 import { apiUrl, positionOptions } from "./variables";
 
@@ -10,21 +10,19 @@ const modal = document.querySelector('dialog') as HTMLDialogElement | null;
 if (!modal) {
   throw new Error('Modal not found');
 }
-modal.addEventListener('click', () => {
-  modal.close();
-});
+// modal.addEventListener('click', () => {
+//   modal.close();
+// });
 
-const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number=>
-  Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinates) => {
   const wrapper = document.querySelector('.restaurant-list-wrapper') as HTMLElement | null;
   if (wrapper !== null) {
     wrapper.innerHTML = '';
     restaurants.forEach((restaurant) => {
-      const x = {latitude: crd.latitude, longitude: crd.longitude};
-      const y = {latitude: restaurant.location.coordinates[1], longitude: restaurant.location.coordinates[0]}
-      const distance =  getDistance(x, y, 1); // distance in meters from geolib
+      const a = {latitude: crd.latitude, longitude: crd.longitude};
+      const b = {latitude: restaurant.location.coordinates[1], longitude: restaurant.location.coordinates[0]}
+      const distance =  getDistance(a, b, 1); // distance in meters from geolib
       const div: HTMLDivElement = restaurantItem(restaurant, distance);
       wrapper.appendChild(div);
       const h2 = div.querySelector('h2') as HTMLHeadingElement | null;
@@ -37,18 +35,43 @@ const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinate
               high.classList.remove('highlight');
             });
             // add highlight
-            div.classList.add('highlight');
+            h2.classList.add('highlight');
             // add restaurant data to modal
             modal.innerHTML = '';
 
             // fetch menu
-            const menu: Menu = await fetchData(
+            const menuDaily: Menu = await fetchData(
               apiUrl + `/restaurants/daily/${restaurant._id}/fi`
             );
-            console.log(menu);
+            console.log(menuDaily);
 
-            const menuHtml = restaurantModal(restaurant, menu);
-            modal.insertAdjacentHTML('beforeend', menuHtml);
+            //fetch weekly menu
+            const menuWeekly: MenuWeekly = await fetchData(apiUrl + `/restaurants/weekly/${restaurant._id}/fi`);
+            console.log(menuWeekly);
+
+
+            const menuDailyHtml = restaurantModal(restaurant, menuDaily, menuWeekly);
+            modal.insertAdjacentHTML('beforeend', menuDailyHtml);
+
+            const menuDailyBtn = document.querySelector('#menu-daily') as HTMLButtonElement | null;
+            const menuWeeklyBtn = document.querySelector('#menu-weekly') as HTMLButtonElement | null;
+            const menuDailyE = document.querySelector('.menu-daily') as HTMLElement | null;
+            const menuWeeklyE = document.querySelector('.menu-weekly') as HTMLElement | null;
+            if (!menuDailyBtn || !menuWeeklyBtn) {
+              throw new Error('Button not found');
+            }
+            if (!menuDailyE || !menuWeeklyE) {
+              throw new Error('Menu element not found');
+            }
+            menuWeeklyE.classList.add('hidden');
+            menuWeeklyBtn.addEventListener('click', () => {
+              menuDailyE.classList.add('hidden');
+              menuWeeklyE.classList.remove('hidden');
+            });
+            menuDailyBtn.addEventListener('click', () => {
+              menuDailyE.classList.remove('hidden');
+              menuWeeklyE.classList.add('hidden');
+            });
 
             modal.showModal();
           } catch (error) {
@@ -69,49 +92,95 @@ const error = (err: GeolocationPositionError) => {
 const success = async (pos: GeolocationPosition) => {
   try {
     const crd = pos.coords;
-    // console.log(crd);
     const restaurants = await fetchData<Restaurant[]>(apiUrl + '/restaurants');
     console.log(restaurants);
+
+    // cities array for filtering restaurants
+    const cities: string[] = [];
+    restaurants.forEach((restaurant) => {
+      const cityName = restaurant.city.toLowerCase();
+      if (!cities.includes(cityName)) {
+        cities.push(cityName);
+      }
+    });
+    const citiesSorted = cities.sort();
     restaurants.sort((a: Restaurant, b: Restaurant) => {
-      const x1: number = crd.latitude;
-      const y1: number = crd.longitude;
-      const x2a: number = a.location.coordinates[1];
-      const y2a: number = a.location.coordinates[0];
-      const distanceA: number = calculateDistance(x1, y1, x2a, y2a);
-      const x2b: number = b.location.coordinates[1];
-      const y2b: number = b.location.coordinates[0];
-      const distanceB: number = calculateDistance(x1, y1, x2b, y2b);
+      const hereCrd = {latitude: crd.latitude, longitude: crd.longitude};
+      const aCrd = {latitude: a.location.coordinates[1],
+        longitude: a.location.coordinates[0]};
+      const bCrd = {latitude: b.location.coordinates[1],
+        longitude: b.location.coordinates[0]};
+
+      const distanceA: number = getDistance(hereCrd, aCrd, 1);
+      const distanceB: number = getDistance(hereCrd, bCrd, 1);
       return distanceA - distanceB;
     });
     createRestaurants(restaurants, crd);
     // buttons for filtering
-    const sodexoBtn = document.querySelector('#sodexo') as HTMLButtonElement | null;
-    const compassBtn = document.querySelector('#compass') as HTMLButtonElement | null;
-    const resetBtn = document.querySelector('#reset') as HTMLButtonElement | null;
+    const nearby = document.querySelector('#nearby') as HTMLButtonElement | null;
+    const companyOptions = document.querySelector('select#company1') as HTMLSelectElement | null;
+    const cityOptions = document.querySelector('#city') as HTMLSelectElement | null;
 
-
-    if (!sodexoBtn || !compassBtn || !resetBtn) {
+    if ( !nearby || !cityOptions
+      || !companyOptions) {
       throw new Error('Button not found');
     }
-    sodexoBtn.addEventListener('click', () => {
-      const sodexoRestaurants = restaurants.filter(
-        (restaurant) => restaurant.company === 'Sodexo'
-      );
-      console.log(sodexoRestaurants);
-      createRestaurants(restaurants, crd);
+
+    // create option elements for filtering by city
+    citiesSorted.forEach((city) => {
+      const cityOptionElement = document.createElement('option');
+      cityOptionElement.setAttribute('value', city);
+      cityOptionElement.innerText = city;
+      cityOptions.appendChild(cityOptionElement);
     });
 
-    compassBtn.addEventListener('click', () => {
-      const compassRestaurants = restaurants.filter(
-        (restaurant) => restaurant.company === 'Compass Group'
-      );
-      console.log(compassRestaurants);
-      createRestaurants(restaurants, crd);
+    // show restaurants according to the selected service provider
+    companyOptions.addEventListener('change', () => {
+      // console.log(companyOptions.value);
+      if (companyOptions.value === 'sodexo') {
+        const sodexoRestaurants = restaurants.filter(
+          (restaurant) => restaurant.company === 'Sodexo'
+        );
+        console.log(sodexoRestaurants);
+        createRestaurants(sodexoRestaurants, crd);
+        cityOptions.value = 'kaupunki';
+      } else if (companyOptions.value === 'compass') {
+        const compassRestaurants = restaurants.filter(
+          (restaurant) => restaurant.company === 'Compass Group'
+        );
+        console.log(compassRestaurants);
+        createRestaurants(compassRestaurants, crd);
+        cityOptions.value = 'kaupunki';
+      } else if (companyOptions.value === 'palveluntarjoaja') {
+        createRestaurants(restaurants, crd);
+        cityOptions.value = 'kaupunki';
+      }
     });
 
-    resetBtn.addEventListener('click', () => {
-      createRestaurants(restaurants, crd);
+    // show restaurants according to the selected city
+    cityOptions.addEventListener('change', () => {
+      if (cityOptions.value === 'kaupunki') {
+        createRestaurants(restaurants, crd);
+        companyOptions.value = 'palveluntarjoaja';
+      } else {
+        console.log(cityOptions.value);
+        const cityRestaurants = restaurants.filter(
+          (restaurant) => restaurant.city.toLowerCase() === cityOptions.value
+        );
+        console.log(cityRestaurants);
+        createRestaurants(cityRestaurants, crd);
+        companyOptions.value = 'palveluntarjoaja';
+      }
+
     });
+
+    nearby.addEventListener('click', () => {
+      createRestaurants(restaurants, crd);
+      cityOptions.value = 'kaupunki';
+      companyOptions.value = 'palveluntarjoaja';
+    });
+
+
   } catch (error) {
     modal.innerHTML = errorModal((error as Error).message);
     modal.showModal();

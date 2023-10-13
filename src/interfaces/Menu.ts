@@ -8,4 +8,13 @@ interface Course {
     price: string;
 }
 
-export type {Menu};
+interface MenuWeekly {
+    days: Day[]
+}
+
+interface Day {
+    date: string,
+    courses: Course[]
+}
+
+export type {Menu, MenuWeekly, Course};

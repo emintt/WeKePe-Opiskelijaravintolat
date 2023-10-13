@@ -33,47 +33,23 @@
     <main>
       <div class="filters">
         <h2>Opiskelijan ravintolat</h2>
-        <div class="buttons">
-          <button>Lähelläni</button>
-          <button id="sodexo">Sodexo</button>
-          <button id="compass">Compass Group</button>
-          <button id="city">Kaupunki</button>
-          <button id="reset">Show all</button>
+        <div class="filter-button">
+          <button id="nearby">Lähelläni</button>
+          <!-- <button id="company"><span class="label">Palveluntarjoaja</span><div><img src="./public/img/icons8-dropdown-30.png" alt="drop-down-icon"></div></button> -->
+          <select name="company1" id="company1">
+            <option value="palveluntarjoaja" >Palveluntarjoaja</option>
+            <option value="sodexo">Sodexo</option>
+            <option value="compass">Compass group</option>
+          </select>
+          <select name="city" id="city">
+            <option value="kaupunki">Kaupunki</option>
+          </select>
+
         </div>
 
       </div>
+
       <div class="restaurant-list-wrapper">
-
-        <div class="restaurant-list-item">
-          <div class="restaurant-list-main">
-              <h2>Klubi</h2>
-              <p>0.3 km matka </p>
-              <p>Mannerheimintie 13A, 00100, Helsinki</p>
-              <p>Compass group</p>
-          </div>
-          <div class="restaurant-list-main">
-            <h2>Helsingin yliopisto Päärakennus</h2>
-            <p>0.3 km matka </p>
-            <p>Mannerheimintie 13A, 00100, Helsinki</p>
-            <!-- <p>+358456613399</p> -->
-            <p>Compass group</p>
-          </div>
-          <div class="restaurant-list-main">
-            <h2>Hanken</h2>
-            <p>0.3 km matka </p>
-            <p>Mannerheimintie 13A, 00100, Helsinki</p>
-            <!-- <p>+358456613399</p> -->
-            <p>Compass group</p>
-          </div>
-          <div class="restaurant-list-main">
-            <h2>Töölö 37</h2>
-            <p>0.3 km matka </p>
-            <!-- <p>Mannerheimintie 13A, 00100, Helsinki</p>
-            <p>+358456613399</p> -->
-            <p>Compass group</p>
-          </div>
-        </div>
-
       </div>
       <div>
         <table>

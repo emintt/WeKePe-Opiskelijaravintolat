@@ -27,10 +27,10 @@ body {
   margin: 0;
 }
 
-body:has(dialog[open]) {
+/* body:has(dialog[open]) {
     overflow-y: hidden;
 }
-
+ */
 h1,
 h2,
 h3,
@@ -105,16 +105,113 @@ a:link {
   background-color: rgb(194, 194, 235);
 }
 
+
 /*filter*/
-.buttons {
+.filters h2 {
+  text-align: center;
+  text-transform: uppercase;
+}
+.filter-button {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #000;
 }
 
-.filters button {
+/*to hide the div element that contains filters' options */
+.hidden {
+  display: none;
+}
+
+.filter-button button, .filter-button select {
   border: none;
   cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 600;
+  background-color: transparent;
+  font-family: 'Worksans';
+  padding: 0;
 }
+
+.filters button label {
+  width: 100%;
+}
+
+.filters button div {
+  width: 25px;
+}
+
+.filters button img{
+  width: 100%;
+  height: 100%;
+  margin-left: 5px;
+}
+
+
+/* MENU */
+.menu-item {
+  display:flex;
+  justify-content: space-between;
+  border-bottom: 1px solid grey;
+  margin-bottom: 1.25em;
+}
+
+.menu-item p {
+  margin: 0;
+}
+
+.menu-item .menu-item-name {
+  flex: 9 1 0;
+  min-width: 360px;
+}
+
+.menu-item .menu-item-price {
+  flex: 3 1 0;
+  text-align: end;
+}
+
+
+
+
+
+/* DIALOG */
+
+dialog {
+  border: 1px solid grey;
+  border-radius: 8px;
+  padding: 0 2em 2em;
+}
+
+/* div, which is the first child within and directly after dialog */
+dialog > div:first-child{
+  margin: 0 auto;
+}
+
+/* restaurant info */
+dialog > div:first-child > div {
+  margin-bottom: 2.5em;
+}
+
+dialog > div:first-child > div > p {
+ margin-top: 0;
+ }
+
+dialog > div:first-child > div p span {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+dialog h3 {
+  text-transform: uppercase;
+  margin: 0;
+  padding: 1em 0;
+  font-size: 1.5em;
+}
+
+.menu-daily {
+  margin-top: 1.25em;
+}
+
 
 form {
   margin: 0 auto;
