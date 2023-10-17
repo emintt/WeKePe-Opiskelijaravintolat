@@ -4,7 +4,7 @@ import { fetchData } from "./functions";
 import { Menu, MenuWeekly } from "./interfaces/Menu";
 import { Restaurant } from "./interfaces/Restaurant";
 import { apiUrl, positionOptions } from "./variables";
-import { LoginUser, RegisterUser, User } from "./interfaces/User";
+import { LoginUser, RegisterUser } from "./interfaces/User";
 
 
 const restaurantDialog = document.querySelector('#restaurant') as HTMLDialogElement | null;
@@ -261,21 +261,19 @@ const register = async (user: {
 }
 
 // function to check if user has logged in and update the dom
-const checkLogin = async (): Promise<boolean> => {
+const checkLogin = async (): Promise<void> => {
   const username = localStorage.getItem('username');
   if (!username) {
-    return false;
+    return;
   }
-  return true;
-}
-
-if (await checkLogin()) {
   loginE.innerText = 'Minun tilini';
 }
 
+checkLogin();
+
 loginE.addEventListener('click', async () => {
-  const logged = await checkLogin();
-  if (!logged) {
+  const username = localStorage.getItem('username') as string | null;
+  if (username === null) {
     loginDialog.showModal();
     const registerE = document.querySelector('#register') as HTMLButtonElement | null;
     if (!registerE) {
@@ -296,7 +294,7 @@ loginE.addEventListener('click', async () => {
         console.log(loginData);
         localStorage.setItem('token', loginData.token);
         localStorage.setItem('username', loginData.data.username);
-        window.location.href = 'profile.html'
+        window.location.href = 'profile/index.html'
         // addUserDataToDom(loginData.data);
       } catch (error) {
         if ((error as Error).message.slice(6,9) === '401') {
@@ -353,8 +351,7 @@ loginE.addEventListener('click', async () => {
       });
     });
   } else {
-
-    window.location.href = 'profile.html';
+    window.location.href = 'profile/index.html';
   }
 
 });
