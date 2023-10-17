@@ -20,13 +20,13 @@
       <nav class="navigation">
         <ul>
           <li><a href="#" id="logo">Student-Eats</a></li>
-          <li><a href="#">Kirjaudu sisään</a></li>
-          <li><a href="#">Suosikit</a></li>
+          <li><button type="button" id="login">Kirjaudu sisään</button></li>
+          <li><button type="button">Suosikit</button></li>
         </ul>
       </nav>
       <div class="banner-container">
         <div class="banner-text-container">
-          <h1>Tervetuloa <br>syömään!</h1>
+          <!-- <h1>Tervetuloa <br>syömään!</h1> -->
         </div>
       </div>
     </header>
@@ -51,20 +51,52 @@
 
       <div class="restaurant-list-wrapper">
       </div>
-      <div>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Address</th>
-          </tr>
-          <!-- add restaurants here -->
-        </table>
-        <!-- modal -->
-        <dialog>
-          <!-- add restaurant info here when restaurant is clicked -->
-        </dialog>
-      </div>
-      <div class="forms">
+      <!-- modal -->
+      <dialog id="restaurant">
+        <!-- add restaurant info here when restaurant is clicked -->
+      </dialog>
+      <dialog id="login-dialog">
+        <section>
+          <h2>Login</h2>
+          <form id="login-form" class="form">
+              <label class="required" for="username">Usename</label><br>
+              <input id="username" type="text" name="username" required><br>
+
+              <label class="required" for="password">Password</label><br>
+              <input id="password" type="password" name="password" required><br>
+
+              <input type="submit" value="Login" class="button" required><br>
+
+              <button type="button" class="button" id="register">Become a memnber</button>
+
+          </form>
+        </section>
+      </dialog>
+
+      <dialog id="register-dialog">
+        <section>
+          <h2>Become a member</h2>
+          <form id="register-form">
+            <div class="form-control">
+              <input id="username-register" type="text" name="username">
+              <label for="username-register">Usename</label>
+            </div>
+            <div class="form-control">
+              <input id="password-register" type="password" name="password">
+              <label for="password-register">Password</label>
+            </div>
+            <div class="form-control">
+              <input id="email-register" type="email" name="email">
+              <label for="email-register">Email</label>
+            </div>
+            <div class="form-control">
+              <input type="submit" value="Register" class="button">
+            </div>
+          </form>
+        </section>
+      </dialog>
+
+      <!-- <div class="forms">
         <h1>Vite PWA Example</h1>
         <section id="login">
           <h2>Login</h2>
@@ -115,7 +147,7 @@
             </div>
           </form>
         </section>
-      </div>
+      </div> -->
   </main>
   <footer>
     Tämä on footeri

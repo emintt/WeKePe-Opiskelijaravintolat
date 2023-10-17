@@ -55,7 +55,7 @@ const menuListHtml = (courses: Course[]): string => {
 
 const restaurantModal = (restaurant: Restaurant, menu: Menu, menuWeekly: MenuWeekly): string => {
   const {name, address, city, postalCode, phone, company} = restaurant;
-  let html = `<div><h3>${name}</h3>
+  let html = `<div class="restaurant-info-container"><span class="close">&#x2715</span><h3>${name}</h3>
     <div class="restaurant-info"><p><span>Yritys: </span>${company}</p>
     <p><span>Osoite: </span>${address} ${postalCode} ${city}</p>
     <p><span>Puhelinnumero: </span>${phone}</p></div></div>
@@ -84,4 +84,13 @@ const errorModal = (message: string) => {
   return html;
 };
 
-export {restaurantRow, restaurantModal, errorModal, restaurantItem};
+
+const successModal = (message: string) => {
+  const html = `
+        <h3>Success</h3>
+        <p>${message}</p>
+        `;
+  return html;
+}
+
+export {restaurantRow, restaurantModal, errorModal, restaurantItem, successModal};

@@ -16,8 +16,15 @@ interface LoginUser {
 }
 
 interface UpdateUser {
-  username: string;
-  email: string;
+  // username: string;
+  // email: string;
+  password: string
 }
 
-export type {User, LoginUser, UpdateUser};
+interface RegisterUser {
+  message: string;
+  data: User;
+  activationUrl: string
+}
+
+export type {User, LoginUser, UpdateUser, RegisterUser};

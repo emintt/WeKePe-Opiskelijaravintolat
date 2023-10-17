@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="main.css" rel="stylesheet">
+  <script type="module" src="src/profile.ts"></script>
+  <title>Minun tilini</title>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <nav class="navigation">
+        <ul>
+          <li><a href="/" id="logo">Student-Eats</a></li>
+          <li><button type="button" id="login">Minun tilini</button></li>
+          <li><button type="button">Suosikit</button></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="forms">
+        <section id="profile">
+          <h2>Profile</h2>
+          <p>Username: <span id="username-target"></span></p>
+          <p>email: <span id="email-target"></span></p>
+          <img id="avatar-target" src="" alt="Avatar">
+          <hr>
+          <h2>Change password</h2>
+          <form id="profile-form">
+            <div class="form-control">
+              <input id="profile-password" type="password" name="password">
+              <label for="profile-password">Password</label>
+            </div>
+            <!-- <div class="form-control">
+              <input id="profile-username" type="text" name="username">
+              <label for="profile-username">Username</label>
+            </div>
+            <div class="form-control">
+              <input id="profile-email" type="email" name="email">
+              <label for="profile-email">Email</label>
+            </div> -->
+            <div class="form-control">
+              <input type="submit" value="Update" class="button">
+            </div>
+          </form>
+        </section>
+      </div>
+  </main>
+  <footer>
+    Tämä on footeri
+  </footer>
+  </div>
+</body>
+</html>

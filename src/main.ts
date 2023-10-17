@@ -1,18 +1,27 @@
 import { getDistance } from "geolib";
-import { errorModal, restaurantModal, restaurantItem } from "./components";
+import { errorModal, restaurantModal, restaurantItem, successModal } from "./components";
 import { fetchData } from "./functions";
 import { Menu, MenuWeekly } from "./interfaces/Menu";
 import { Restaurant } from "./interfaces/Restaurant";
 import { apiUrl, positionOptions } from "./variables";
+import { LoginUser, RegisterUser, User } from "./interfaces/User";
 
 
-const modal = document.querySelector('dialog') as HTMLDialogElement | null;
-if (!modal) {
+const restaurantDialog = document.querySelector('#restaurant') as HTMLDialogElement | null;
+const loginDialog = document.querySelector('#login-dialog') as HTMLDialogElement | null;
+const registerDialog = document.querySelector('#register-dialog') as HTMLDialogElement | null;
+
+const loginE = document.querySelector('#login') as HTMLButtonElement | null;
+
+
+if (!restaurantDialog || !loginDialog || !registerDialog) {
   throw new Error('Modal not found');
 }
-// modal.addEventListener('click', () => {
-//   modal.close();
-// });
+
+if (!loginE) {
+  throw new Error('Login button not found');
+}
+
 
 
 const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinates) => {
@@ -21,7 +30,7 @@ const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinate
     wrapper.innerHTML = '';
     restaurants.forEach((restaurant) => {
       const a = {latitude: crd.latitude, longitude: crd.longitude};
-      const b = {latitude: restaurant.location.coordinates[1], longitude: restaurant.location.coordinates[0]}
+      const b = {latitude: restaurant.location.coordinates[1], longitude: restaurant.location.coordinates[0]};
       const distance =  getDistance(a, b, 1); // distance in meters from geolib
       const div: HTMLDivElement = restaurantItem(restaurant, distance);
       wrapper.appendChild(div);
@@ -37,27 +46,29 @@ const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinate
             // add highlight
             h2.classList.add('highlight');
             // add restaurant data to modal
-            modal.innerHTML = '';
+            restaurantDialog.innerHTML = '';
 
             // fetch menu
             const menuDaily: Menu = await fetchData(
               apiUrl + `/restaurants/daily/${restaurant._id}/fi`
             );
-            console.log(menuDaily);
+            // console.log(menuDaily);
 
             //fetch weekly menu
             const menuWeekly: MenuWeekly = await fetchData(apiUrl + `/restaurants/weekly/${restaurant._id}/fi`);
-            console.log(menuWeekly);
+            // console.log(menuWeekly);
 
 
             const menuDailyHtml = restaurantModal(restaurant, menuDaily, menuWeekly);
-            modal.insertAdjacentHTML('beforeend', menuDailyHtml);
+            restaurantDialog.insertAdjacentHTML('beforeend', menuDailyHtml);
 
             const menuDailyBtn = document.querySelector('#menu-daily') as HTMLButtonElement | null;
             const menuWeeklyBtn = document.querySelector('#menu-weekly') as HTMLButtonElement | null;
             const menuDailyE = document.querySelector('.menu-daily') as HTMLElement | null;
             const menuWeeklyE = document.querySelector('.menu-weekly') as HTMLElement | null;
-            if (!menuDailyBtn || !menuWeeklyBtn) {
+            const closeE = document.querySelector('.close') as HTMLElement | null;
+
+            if (!menuDailyBtn || !menuWeeklyBtn || !closeE) {
               throw new Error('Button not found');
             }
             if (!menuDailyE || !menuWeeklyE) {
@@ -73,10 +84,15 @@ const createRestaurants = (restaurants: Restaurant[], crd: GeolocationCoordinate
               menuWeeklyE.classList.add('hidden');
             });
 
-            modal.showModal();
+            restaurantDialog.showModal();
+
+            closeE.addEventListener('click', () => {
+              restaurantDialog.close();
+            });
+
           } catch (error) {
-            modal.innerHTML = errorModal((error as Error).message);
-            modal.showModal();
+            restaurantDialog.innerHTML = errorModal((error as Error).message);
+            restaurantDialog.showModal();
           }
         });
       }
@@ -182,15 +198,166 @@ const success = async (pos: GeolocationPosition) => {
 
 
   } catch (error) {
-    modal.innerHTML = errorModal((error as Error).message);
-    modal.showModal();
+    restaurantDialog.innerHTML = errorModal((error as Error).message);
+    restaurantDialog.showModal();
   }
 };
 
 navigator.geolocation.getCurrentPosition(success, error, positionOptions);
 
+// Login & register
+// select forms from the DOM
+const loginForm = document.querySelector('#login-form');
+const registerForm = document.querySelector('#register-form');
+
+// select inputs from the DOM
+const usernameInput = document.querySelector(
+  '#username'
+) as HTMLInputElement | null;
+const passwordInput = document.querySelector(
+  '#password'
+) as HTMLInputElement | null;
+
+const usernameInputRe = document.querySelector(
+  '#username-register'
+) as HTMLInputElement | null;
+const passwordInputRe = document.querySelector(
+  '#password-register'
+) as HTMLInputElement | null;
+const emailInputRe = document.querySelector(
+  '#email-register'
+) as HTMLInputElement | null;
 
 
+// function to login
+const login = async (user: {
+  username: string,
+  password: string
+}): Promise<LoginUser> => {
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user),
+  }
+  return await fetchData<LoginUser>(apiUrl + '/auth/login', options);
+};
+
+// function to register
+const register = async (user: {
+  username: string,
+  password: string,
+  email: string
+}): Promise<RegisterUser> => {
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user),
+  }
+  return await fetchData(apiUrl + '/users', options);
+}
+
+// function to check if user has logged in and update the dom
+const checkLogin = async (): Promise<boolean> => {
+  const username = localStorage.getItem('username');
+  if (!username) {
+    return false;
+  }
+  return true;
+}
+
+if (await checkLogin()) {
+  loginE.innerText = 'Minun tilini';
+}
+
+loginE.addEventListener('click', async () => {
+  const logged = await checkLogin();
+  if (!logged) {
+    loginDialog.showModal();
+    const registerE = document.querySelector('#register') as HTMLButtonElement | null;
+    if (!registerE) {
+      throw new Error('Register button not found');
+    }
+
+    loginForm?.addEventListener('submit', async (evt) => {
+      try {
+        evt.preventDefault();
+        if (!usernameInput || !passwordInput) {
+          return;
+        }
+        const user = {
+          username: usernameInput.value,
+          password: passwordInput.value,
+        };
+        const loginData = await login(user);
+        console.log(loginData);
+        localStorage.setItem('token', loginData.token);
+        localStorage.setItem('username', loginData.data.username);
+        window.location.href = 'profile.html'
+        // addUserDataToDom(loginData.data);
+      } catch (error) {
+        if ((error as Error).message.slice(6,9) === '401') {
+          const message = document.querySelector('.alert') as HTMLElement | null;
+          if (message === null) {
+            const span = document.createElement('span');
+            span.innerText = "Incorrect username or password. Please try again!";
+            span.classList.add('alert');
+            loginForm.insertAdjacentElement('afterbegin', span);
+          }
+        } else {
+          restaurantDialog.innerHTML = errorModal((error as Error).message);
+          restaurantDialog.showModal();
+        }
+
+      }
+    });
+    // event listener for register button inside login form
+    registerE.addEventListener('click', () => {
+      loginDialog.close();
+      registerDialog.showModal();
+      registerForm?.addEventListener('submit', async (evt) => {
+        try {
+          evt.preventDefault();
+          if (!usernameInputRe || !passwordInputRe || !emailInputRe) {
+            return;
+          }
+          const user = {
+            username: usernameInputRe.value,
+            password: passwordInputRe.value,
+            email: emailInputRe.value
+          };
+          const registerData = await register(user);
+          console.log(registerData.message);
+          const message = 'Congratulations, your account has been successfully created!';
+          const html = successModal(message);
+          restaurantDialog.innerHTML = html;
+          registerDialog.close();
+          restaurantDialog.showModal();
+        } catch (error) {
+          if ((error as Error).message.slice(6,9) === '400') {
+            const message = document.querySelector('.alert') as HTMLElement | null;
+            if (message === null) {
+              const span = document.createElement('span');
+              span.innerText = "Username or email already exists";
+              span.classList.add('alert');
+              registerForm.insertAdjacentElement('afterbegin', span);
+            }
+          } else {
+            restaurantDialog.innerHTML = errorModal((error as Error).message);
+            restaurantDialog.showModal();
+          }
+        }
+      });
+    });
+  } else {
+
+    window.location.href = 'profile.html';
+  }
+
+});
 
 // login, update, upload
 /* import {fetchData} from './functions';

@@ -19,7 +19,8 @@
 
 :root {
   --black: #000;
-
+  --red: #FF0000;
+  --green: #008000;
 }
 
 body {
@@ -27,10 +28,10 @@ body {
   margin: 0;
 }
 
-/* body:has(dialog[open]) {
+body:has(dialog[open]) {
     overflow-y: hidden;
 }
- */
+
 h1,
 h2,
 h3,
@@ -74,6 +75,13 @@ ul {
   text-align: left;
 }
 
+.navigation button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-family: 'Worksans';
+  font-size: 1em;
+}
 
 
 a:link {
@@ -182,21 +190,31 @@ dialog {
   padding: 0 2em 2em;
 }
 
-/* div, which is the first child within and directly after dialog */
-dialog > div:first-child{
-  margin: 0 auto;
+dialog > .restaurant-info-container{
+  position: relative;
 }
 
+
+dialog .close {
+  font-size: 1.5em;
+  position:absolute;
+  top: 1em;
+  right: 0;
+  transform: translate(-50%);
+  cursor: pointer;
+}
+
+
 /* restaurant info */
-dialog > div:first-child > div {
+dialog .restaurant-info {
   margin-bottom: 2.5em;
 }
 
-dialog > div:first-child > div > p {
+dialog .restaurant-info p {
  margin-top: 0;
  }
 
-dialog > div:first-child > div p span {
+dialog .restaurant-info p span {
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -213,9 +231,17 @@ dialog h3 {
 }
 
 
+/* LOGIN */
+
+.alert {
+  color: red;
+  display: block;
+  margin-bottom: 8px;
+}
+
 form {
   margin: 0 auto;
-  max-width: 400px;
+  width: 400px;
 }
 
 input {
@@ -249,7 +275,21 @@ input {
   border-radius: 5px;
 }
 
-#avatar-target {
-  max-width: 100%;
-  height: auto;
+.form label.required:after {
+  content: " *";
+  color: var(--red);
 }
+
+.form input:invalid {
+  border: 1px solid var(--red);
+}
+
+.form input:valid {
+  border-color: var(--green);
+
+}
+
+.form input:focus {
+  background-color: rgb(231, 241, 227);
+}
+
