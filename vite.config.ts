@@ -20,7 +20,7 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf}'],
         sourcemap: true
       },
       manifest: {

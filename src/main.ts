@@ -26,6 +26,17 @@ const updateSW = registerSW({
   },
 });
 
+// toggle dark theme
+const checkbox = document.querySelector('.checkbox') as HTMLInputElement | null;
+if (!checkbox) {
+  throw new Error('Check box not found');
+}
+checkbox.addEventListener("change", () => {
+  document.body.classList.toggle("dark");
+  document.querySelector('.banner-container')?.classList.toggle('dark');
+  document.querySelector('main')?.classList.toggle('dark');
+})
+
 
 // select dialog elements from the DOM
 const restaurantDialog = document.querySelector('#restaurant') as HTMLDialogElement | null;

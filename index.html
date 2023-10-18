@@ -10,26 +10,28 @@
   <link rel="apple-touch-icon" href="/icons/icon-192x192.png" sizes="192x192">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://kit.fontawesome.com/6f7922c09b.js" crossorigin="anonymous"></script>
   <script type="module" src="src/main.ts"></script>
   <title>Vite + TS</title>
 </head>
 
 <body>
-  <div class="container">
+  <!-- <div class="container"> -->
     <header>
       <nav class="navigation">
         <ul>
           <li><a href="#" id="logo">Student-Eats</a></li>
           <li><button type="button" id="login">Kirjaudu sisään</button></li>
-          <li><button type="button">Suosikit</button></li>
         </ul>
       </nav>
       <div class="banner-container">
         <div class="banner-text-container">
-          <!-- <h1>Tervetuloa <br>syömään!</h1> -->
+          <h1>Mitä tänään syödään?</h1>
         </div>
       </div>
     </header>
+    <div class="container">
+
     <main>
       <div class="filters">
         <h2>Opiskelijan ravintolat</h2>
@@ -47,6 +49,18 @@
 
         </div>
 
+      </div>
+      <div class="dark-theme">
+        <span>Vaalea teema</span>
+        <div class="dark-theme-toggler">
+          <input type="checkbox" class="checkbox" id="checkbox">
+          <label for="checkbox" class="checkbox-label">
+              <i class="fas fa-moon"></i>
+              <i class="fas fa-sun"></i>
+              <span class="ball"></span>
+          </label>
+        </div>
+        <span>Tumma teema</span>
       </div>
 
       <div class="restaurant-list-wrapper">
@@ -92,11 +106,12 @@
           </form>
         </section>
       </dialog>
-  </main>
-  <footer>
-    Tämä on footeri
-  </footer>
+    </main>
+  <!-- </div> -->
   </div>
+  <footer>
+    Copyright 2023. All Rights Reserved
+  </footer>
 </body>
 
 </html>
