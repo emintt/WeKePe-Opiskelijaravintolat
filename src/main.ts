@@ -6,7 +6,28 @@ import { Restaurant } from "./interfaces/Restaurant";
 import { apiUrl, positionOptions } from "./variables";
 import { LoginUser, RegisterUser } from "./interfaces/User";
 
+import {registerSW} from 'virtual:pwa-register';
 
+// PWA code
+//console.log(pwaInfo);
+
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    console.log('onNeedRefresh');
+    const update = confirm('New version available. Update?');
+    if (update) {
+      updateSW(true);
+    }
+  },
+  onOfflineReady() {
+    console.log('onOfflineReady');
+    alert('App is offline ready');
+  },
+});
+
+
+// select dialog elements from the DOM
 const restaurantDialog = document.querySelector('#restaurant') as HTMLDialogElement | null;
 const loginDialog = document.querySelector('#login-dialog') as HTMLDialogElement | null;
 const registerDialog = document.querySelector('#register-dialog') as HTMLDialogElement | null;
@@ -364,6 +385,7 @@ import {LoginUser, UpdateUser, User} from './interfaces/User';
 import {apiUrl, uploadUrl} from './variables';
 
 // PWA code
+
 
 // select forms from the DOM
 const loginForm = document.querySelector('#login-form');
